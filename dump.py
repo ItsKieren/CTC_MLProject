@@ -3,12 +3,17 @@ from collections import defaultdict
 import time
 import csv
 
+# Create a dictionary to store connection information
 connections = defaultdict(lambda: {
-    'start_time': None, 'end_time': None,
-    'out_bytes': 0, 'in_bytes': 0, 'tot_pkts': 0,
-    'state': set()
+    'start_time': None,
+    'end_time': None,
+    'out_bytes' : 0,
+    'in_bytes'  : 0,
+    'tot_pkts'  : 0,
+    'state'     : set()
 })
 
+# Function to categorize ports based on the known ranges
 def port_category(port):
     if port is None:
         return "Unknown"
@@ -20,8 +25,11 @@ def port_category(port):
         return "Private"
     return "Unknown"
 
+# Callback function to process each captured packet (connection details, tracks packet stats, and prints packet information)
 def packet_callback(packet):
+    # Check if the packet contains an IP layer
     if IP in packet:
+        # Extract information from the packet
         src_ip = packet[IP].src
         dst_ip = packet[IP].dst
         protocol = packet[IP].proto
@@ -34,23 +42,24 @@ def packet_callback(packet):
         connection_key = (src_ip, dst_ip, src_port, dst_port, protocol)
         rev_connection_key = (dst_ip, src_ip, dst_port, src_port, protocol)
 
-        # Determine incoming/outgoing direction
+        # Determine incoming/outgoing direction of traffic
         direction = '->' if connection_key in connections else '<-'
 
+        # Set the start time for a new connection
         if connections[connection_key]['start_time'] is None:
             connections[connection_key]['start_time'] = time.time()
 
         # Update connection end time
         connections[connection_key]['end_time'] = time.time()
 
-        # Update packet and byte counts
+         # Update the packet and byte counts based on the direction
         if direction == '->':
             connections[connection_key]['out_bytes'] += length
         else:
             connections[connection_key]['in_bytes'] += length
         connections[connection_key]['tot_pkts'] += 1
 
-        # Track TCP states if applicable
+        # Track TCP states if applicable (packets with TCP layer only)
         if TCP in packet:
             flags = packet.sprintf("%TCP.flags%")
             if "S" in flags:
@@ -117,15 +126,17 @@ def save_to_csv():
 
     print(f"\n[INFO] Traffic data saved to {filename}")
 
-# Set the duration for packet capture in seconds (default is 5 seconds | change value 5 as needed)
+# Set the duration for packet capture in seconds
 capture_duration = 10
 
 print(f"[INFO] Starting packet capture for {capture_duration} seconds...")
 start_time = time.time()
 
+# Start packet sniffing loop
 try:
     while time.time() - start_time < capture_duration:
-        sniff(prn=packet_callback, timeout=5, store=0)  # Capture packets in 5-second intervals
+        # Capture packets in 5-second intervals
+        sniff(prn=packet_callback, timeout=5, store=0)
 except KeyboardInterrupt:
     print("\n[INFO] Stopping capture early...")
 
