@@ -23,26 +23,18 @@ GIF created with LiceCap
 ### Notes
 Challenges Encountered:
 
-## Open-source libraries used
-Scapy: For packet sniffing and network traffic analysis.
+### Open-source libraries used
+- Scapy: For packet sniffing and network traffic analysis.
 
-Matplotlib: For visualizing network activity.
+- Matplotlib: For visualizing network activity.
 
-Flask: For building the web interface.
+- Flask: For building the web interface.
 
-Collections: For efficiently managing network connection data.
+- Collections: For efficiently managing network connection data.
 
-CSV: For saving and analyzing captured network traffic data.
+- CSV: For saving and analyzing captured network traffic data.
 
-Sklearn (for AI/ML): For implementing machine learning algorithms that help detect botnet behavior in network traffic.
+- Sklearn (for AI/ML): For implementing machine learning algorithms that help detect botnet behavior in network traffic.
 
 ###License
 Copyright [2025] [404NotFound Team - Hackathon @ Concordia University 2025]
-
-
-Describe any challenges encountered while building the app.
-
-### Open-source libraries used
-
-- [Android Async HTTP](https://github.com/codepath/CPAsyncHttpClient) - Simple asynchronous HTTP requests with JSON parsing
-- [Glide](https://github.com/bumptech/glide) - Image loading and caching library for Androids
