@@ -44,25 +44,25 @@ Traditional botnet detection methods rely on signature-based or heuristic approa
 - **User-friendly Output**: Clear, organized console output with visual indicators
 
 ## 🚀 Steps to Use
-1. **Install Dependencies**:
-   ```bash
-   # Ensure Python 3.10.12 is installed
-   pip install -r requirements.txt
-   ```
-
-2. **Clone Repository**:
+1. **Clone Repository**:
    ```bash
    git clone git@github.com:ItsKieren/CTC_MLProject.git
    cd CTC_MLProject
    ```
 
-3. **Set Up Environment**:
+2. **Set Up Environment**:
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # Linux/macOS
    .\venv\Scripts\activate   # Windows
    ```
-
+   
+3. **Install Dependencies**:
+   ```bash
+   # Ensure Python 3.10.12 is installed
+   pip install -r requirements.txt
+   ```
+   
 4. **Unzip Model**:
    ```bash
    7z x CTC_MLProeject/models/random_forest_model.7z
