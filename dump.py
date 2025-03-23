@@ -1,19 +1,34 @@
+from flask import Flask, request, redirect, url_for, send_file, render_template
 from scapy.all import sniff, IP, TCP, UDP, Raw
 from collections import defaultdict
 import time
 import csv
+import threading
+from datetime import datetime
 
-# Create a dictionary to store connection information
+app = Flask(__name__, template_folder="templates")
+
+# ----------------------------
+# Global Data Structures
+# ----------------------------
+
 connections = defaultdict(lambda: {
     'start_time': None,
     'end_time': None,
-    'out_bytes' : 0,
-    'in_bytes'  : 0,
-    'tot_pkts'  : 0,
-    'state'     : set()
+    'out_bytes': 0,
+    'in_bytes': 0,
+    'tot_pkts': 0,
+    'state': set()
 })
 
-# Function to categorize ports based on the known ranges
+# Flag and thread for background capture
+capturing = False
+capture_thread = None
+
+# ----------------------------
+# Helper Functions
+# ----------------------------
+
 def port_category(port):
     if port is None:
         return "Unknown"
@@ -25,41 +40,41 @@ def port_category(port):
         return "Private"
     return "Unknown"
 
-# Callback function to process each captured packet (connection details, tracks packet stats, and prints packet information)
 def packet_callback(packet):
-    # Check if the packet contains an IP layer
+    """This callback function is invoked for each sniffed packet."""
     if IP in packet:
-        # Extract information from the packet
         src_ip = packet[IP].src
         dst_ip = packet[IP].dst
         protocol = packet[IP].proto
+        
         src_port = packet[TCP].sport if TCP in packet else (packet[UDP].sport if UDP in packet else None)
         dst_port = packet[TCP].dport if TCP in packet else (packet[UDP].dport if UDP in packet else None)
         tos = packet[IP].tos
         length = len(packet)
-
-        # Define unique connection key
+        
+        # Unique connection key
         connection_key = (src_ip, dst_ip, src_port, dst_port, protocol)
-        rev_connection_key = (dst_ip, src_ip, dst_port, src_port, protocol)
 
-        # Determine incoming/outgoing direction of traffic
+        # Check direction
+        # If the connection_key is new, we treat the first packet as '->'
         direction = '->' if connection_key in connections else '<-'
 
-        # Set the start time for a new connection
+        # Initialize start_time if first time
         if connections[connection_key]['start_time'] is None:
             connections[connection_key]['start_time'] = time.time()
 
-        # Update connection end time
+        # Update end_time
         connections[connection_key]['end_time'] = time.time()
 
-         # Update the packet and byte counts based on the direction
+        # Update packet/byte counters
         if direction == '->':
             connections[connection_key]['out_bytes'] += length
         else:
             connections[connection_key]['in_bytes'] += length
+        
         connections[connection_key]['tot_pkts'] += 1
 
-        # Track TCP states if applicable (packets with TCP layer only)
+        # Track TCP flags if applicable
         if TCP in packet:
             flags = packet.sprintf("%TCP.flags%")
             if "S" in flags:
@@ -71,75 +86,145 @@ def packet_callback(packet):
             if "R" in flags:
                 connections[connection_key]['state'].add("RST")
 
-        # Calculate duration and rates
-        duration = connections[connection_key]['end_time'] - connections[connection_key]['start_time']
-        out_bytes = connections[connection_key]['out_bytes']
-        in_bytes = connections[connection_key]['in_bytes']
-        tot_pkts = connections[connection_key]['tot_pkts']
-        tot_bytes = out_bytes + in_bytes
-        bytes_per_sec = tot_bytes / duration if duration > 0 else 0
-        bytes_per_pkt = tot_bytes / tot_pkts if tot_pkts > 0 else 0
-        pkts_per_sec = tot_pkts / duration if duration > 0 else 0
-        ratio_out_in = out_bytes / in_bytes if in_bytes > 0 else float('inf')
+def sniff_packets():
+    """Repeatedly sniff packets in short intervals while 'capturing' is True."""
+    while capturing:
+        sniff(prn=packet_callback, timeout=5, store=0)
 
-        # Print details
-        print(f"Src IP: {src_ip}, Dst IP: {dst_ip}")
-        print(f"Src Port: {src_port} ({port_category(src_port)}), Dst Port: {dst_port} ({port_category(dst_port)})")
-        print(f"Proto: {protocol}, ToS: {tos}")
-        print(f"Duration: {duration:.2f}s, OutBytes: {out_bytes}, InBytes: {in_bytes}")
-        print(f"Total Packets: {tot_pkts}, Total Bytes: {tot_bytes}")
-        print(f"Bytes/sec: {bytes_per_sec:.2f}, Bytes/pkt: {bytes_per_pkt:.2f}, Pkts/sec: {pkts_per_sec:.2f}")
-        print(f"Ratio Out/In: {ratio_out_in:.2f}")
-        print(f"State Flags: {', '.join(connections[connection_key]['state'])}")
-        print(f"Direction: {direction}")
-        print("-" * 60)
-
-# Function to save connection data to a CSV file
-def save_to_csv():
-    filename = "network_traffic.csv"
+def save_to_csv(filename="network_traffic.csv"):
+    """Save connection data to CSV (same columns/format as original)."""
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
         # Write CSV header
-        writer.writerow(["Src IP", "Dst IP", "Src Port", "Dst Port", "Protocol", "Duration (s)", 
-                         "Out Bytes", "In Bytes", "Total Packets", "Total Bytes", 
-                         "Bytes/sec", "Bytes/pkt", "Pkts/sec", "Ratio Out/In", "State Flags", "Direction"])
+        writer.writerow([
+            "Src IP", "Dst IP", "Src Port", "Dst Port", "Protocol", 
+            "Duration (s)", "Out Bytes", "In Bytes", "Total Packets",
+            "Total Bytes", "Bytes/sec", "Bytes/pkt", "Pkts/sec",
+            "Ratio Out/In", "State Flags", "Direction"
+        ])
 
-        # Write each connection's data
         for (src_ip, dst_ip, src_port, dst_port, protocol), data in connections.items():
-            duration = data['end_time'] - data['start_time'] if data['start_time'] else 0
+            if data['start_time'] is None:
+                continue
+
+            duration = data['end_time'] - data['start_time']
             out_bytes = data['out_bytes']
             in_bytes = data['in_bytes']
             tot_pkts = data['tot_pkts']
             tot_bytes = out_bytes + in_bytes
+
             bytes_per_sec = tot_bytes / duration if duration > 0 else 0
             bytes_per_pkt = tot_bytes / tot_pkts if tot_pkts > 0 else 0
             pkts_per_sec = tot_pkts / duration if duration > 0 else 0
             ratio_out_in = out_bytes / in_bytes if in_bytes > 0 else float('inf')
             state_flags = ', '.join(data['state'])
 
-            # Write row to CSV
-            writer.writerow([src_ip, dst_ip, src_port, dst_port, protocol, 
-                             f"{duration:.2f}", out_bytes, in_bytes, 
-                             tot_pkts, tot_bytes, f"{bytes_per_sec:.2f}", 
-                             f"{bytes_per_pkt:.2f}", f"{pkts_per_sec:.2f}", 
-                             f"{ratio_out_in:.2f}", state_flags, "->"])
+            writer.writerow([
+                src_ip,
+                dst_ip,
+                src_port,
+                dst_port,
+                protocol,
+                f"{duration:.2f}",
+                out_bytes,
+                in_bytes,
+                tot_pkts,
+                tot_bytes,
+                f"{bytes_per_sec:.2f}",
+                f"{bytes_per_pkt:.2f}",
+                f"{pkts_per_sec:.2f}",
+                f"{ratio_out_in:.2f}" if ratio_out_in != float('inf') else "inf",
+                state_flags,
+                "->"
+            ])
 
-    print(f"\n[INFO] Traffic data saved to {filename}")
+@app.route("/")
+def index():
+    """
+    Build a 'table_data' list of dicts for each connection,
+    doing all float calculations in Python. Pass the
+    final (string) values to the template to avoid Jinja float issues.
+    """
+    table_data = []
+    for (src_ip, dst_ip, src_port, dst_port, protocol), data in connections.items():
+        if data['start_time'] is None:
+            continue
+        duration = data['end_time'] - data['start_time']
+        out_bytes = data['out_bytes']
+        in_bytes = data['in_bytes']
+        tot_pkts = data['tot_pkts']
+        tot_bytes = out_bytes + in_bytes
+        
+        if duration > 0:
+            bps = tot_bytes / duration
+            bpp = tot_bytes / tot_pkts if tot_pkts > 0 else 0
+            pps = tot_pkts / duration
+        else:
+            bps = 0
+            bpp = 0
+            pps = 0
+        
+        if in_bytes > 0:
+            ratio = out_bytes / in_bytes
+        else:
+            ratio = float('inf')
+        
+        state_flags = ", ".join(data['state'])
 
-# Set the duration for packet capture in seconds
-capture_duration = 10
+        # Create a human-readable timestamp from the end_time
+        timestamp_str = datetime.fromtimestamp(data['end_time']).strftime('%Y-%m-%d %H:%M:%S')
 
-print(f"[INFO] Starting packet capture for {capture_duration} seconds...")
-start_time = time.time()
+        table_data.append({
+            "src_ip": src_ip,
+            "dst_ip": dst_ip,
+            "src_port": src_port,
+            "dst_port": dst_port,
+            "protocol": protocol,
+            "duration": f"{duration:.2f}",
+            "out_bytes": out_bytes,
+            "in_bytes": in_bytes,
+            "tot_pkts": tot_pkts,
+            "tot_bytes": tot_bytes,
+            "bytes_per_sec": f"{bps:.2f}",
+            "bytes_per_pkt": f"{bpp:.2f}",
+            "pkts_per_sec": f"{pps:.2f}",
+            "ratio_out_in": f"{ratio:.2f}" if ratio != float('inf') else "inf",
+            "state_flags": state_flags,
+            "timestamp": timestamp_str
+        })
 
-# Start packet sniffing loop
-try:
-    while time.time() - start_time < capture_duration:
-        # Capture packets in 5-second intervals
-        sniff(prn=packet_callback, timeout=5, store=0)
-except KeyboardInterrupt:
-    print("\n[INFO] Stopping capture early...")
+    return render_template("index.html", table_data=table_data)
 
-# Save data to CSV
-save_to_csv()
-print("Data has been saved to network_traffic.csv")
+@app.route("/start", methods=["POST"])
+def start_capture():
+    """Start the background sniffing thread (if not already running)."""
+    global capturing, capture_thread
+    if not capturing:
+        capturing = True
+        capture_thread = threading.Thread(target=sniff_packets, daemon=True)
+        capture_thread.start()
+    return redirect(url_for("index"))
+
+@app.route("/stop", methods=["POST"])
+def stop_capture():
+    """Stop the background sniffing thread and save the CSV."""
+    global capturing
+    if capturing:
+        capturing = False
+        save_to_csv()  # automatically save the CSV on stop
+    filename = "network_traffic.csv"
+    return send_file(filename, as_attachment=True)
+
+@app.route("/download_csv")
+def download_csv():
+    """Regenerate (or reuse) the CSV file and return it for download."""
+    filename = "network_traffic.csv"
+    save_to_csv(filename)
+    return send_file(filename, as_attachment=True)
+
+def run_server(host="0.0.0.0", port=8080):
+    # Must run with privileges (e.g., 'sudo') to allow Scapy to capture packets
+    app.run(host=host, port=port, debug=False)
+
+if __name__ == "__main__":
+    run_server()
