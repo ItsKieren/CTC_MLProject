@@ -5,7 +5,7 @@ Botnet Detection Tool is an AI-driven cybersecurity application designed to dete
 
 #### The following functionality is completed:
 
-- [ x ] User can start network traffic capture to analyze incoming and outgoing network data.
+- [ x ] User can start network traffic capture to analyze incoming and outgoing network data in real time, allowing for proactive threat monitoring.
 - [ x ] User can stop network traffic capture to halt data collection.
 - [ x ] User can download network traffic data in CSV format for further analysis.
 - [ x ] User can visualize traffic patterns using graphs showing traffic trends, protocol distribution, and port category distribution.
@@ -23,7 +23,7 @@ GIF created with LiceCap
 ### Notes
 Challenges Encountered:
 
-- Capturing network traffic in real time requires processing a continuous stream of data without causing system slowdowns. The challenge is balancing speed and accuracy, making sure data for meaningful analysis is collected while keeping resource usage low
+- Processing real-time network traffic efficiently without causing performance slowdowns requires optimizing data collection and minimizing system resource usage
 
 - Graphs and dashboards need to update dynamically while remaining responsive, as network traffic could generate thousands of packets per second.
 
@@ -42,5 +42,5 @@ Challenges Encountered:
 
 - Sklearn (for AI/ML): For implementing machine learning algorithms that help detect botnet behavior in network traffic.
 
-###License
+### License
 Copyright [2025] [404NotFound Team - Hackathon @ Concordia University 2025]
