@@ -179,7 +179,7 @@ def process_file(file_path, model, label_encoders, processed_dir, start_time):
         
         # Define output file path before any processing
         file_number = file_path.split('network_traffic_')[-1].split('.')[0]
-        output_file = os.path.join(processed_dir, f'processed_network_traffic-{file_number}.csv')
+        output_file = os.path.join(processed_dir, f'processed_network_traffic_{file_number}.csv')
         
         # Load and preprocess the data
         data = pd.read_csv(file_path)
