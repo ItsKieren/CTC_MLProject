@@ -5,7 +5,7 @@ Botnet Detection Tool is an AI-driven cybersecurity application designed to dete
 
 #### The following functionality is completed:
 
-- [ x ] User can start network traffic capture to analyze incoming and outgoing network data in real time, allowing for proactive threat monitoring.
+- [ x ] User can start network traffic capture to analyze incoming and outgoing network data in real-time, allowing for proactive threat monitoring.
 - [ x ] User can stop network traffic capture to halt data collection.
 - [ x ] User can download network traffic data in CSV format for further analysis.
 - [ x ] User can visualize traffic patterns using graphs showing traffic trends, protocol distribution, and port category distribution.
@@ -31,8 +31,6 @@ Challenges Encountered:
 
 ### Open-source libraries used
 - Scapy: For packet sniffing and network traffic analysis.
-
-- Matplotlib: For visualizing network activity.
 
 - Flask: For building the web interface.
 
