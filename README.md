@@ -3,7 +3,7 @@ Botnet Detection Tool is an AI-driven cybersecurity application designed to dete
 
 ### User Stories
 
-#### REQUIRED (10pts)
+#### The following functionality is completed:
 
 - [ x ] User can start network traffic capture to analyze incoming and outgoing network data.
 - [ x ] User can stop network traffic capture to halt data collection.
