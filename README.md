@@ -63,7 +63,12 @@ Traditional botnet detection methods rely on signature-based or heuristic approa
    .\venv\Scripts\activate   # Windows
    ```
 
-4. **Run Application**:
+4. **Unzip Model**:
+   ```bash
+   Unzip CTC_MLProeject/models/random_forest_model.7z using 7zip
+   ```
+
+5. **Run Application**:
    ```bash
    python dump.py
    python monitor.py
@@ -93,10 +98,18 @@ We welcome contributions! Please follow these steps:
 | QA & Documentation | Eldwin C |
 
 ## 🙏 Credits
-**DReLAB Dataset** (Deep REinforcement Learning Adversarial Botnet dataset)  
-DOI: 10.17632/nf22d786tj.1  
-Published: December 9, 2020  
-Contributors: Andrea Venturi, Michele Colajanni
+**DReLAB Dataset** (Deep REinforcement Learning Adversarial Botnet dataset) DOI: 10.17632/nf22d786tj.1  
+**joblib**
+**numpy**
+**pandas**
+**python-dateutil**
+**pytz**
+**scikit-learn**
+**scipy**
+**six**
+**threadpoolctl**
+**tzdata**
+**watchdog**
 
 ## 📄 License
 © 2025 | 404NotFound Team - Hackathon @ Concordia University 2025
