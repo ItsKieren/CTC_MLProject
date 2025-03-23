@@ -23,6 +23,12 @@ GIF created with LiceCap
 ### Notes
 Challenges Encountered:
 
+- Capturing network traffic in real time requires processing a continuous stream of data without causing system slowdowns. The challenge is balancing speed and accuracy, making sure data for meaningful analysis is collected while keeping resource usage low
+
+- Graphs and dashboards need to update dynamically while remaining responsive, as network traffic could generate thousands of packets per second.
+
+- Detecting botnet activity involves training models to distinguish between normal and malicious network behavior. It is important that flagging normal activity as botnet-related (false positives) or failing to detect actual threats (false negatives) is reduced.
+
 ### Open-source libraries used
 - Scapy: For packet sniffing and network traffic analysis.
 
