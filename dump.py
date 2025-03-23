@@ -208,19 +208,72 @@ def start_capture():
 @app.route("/stop", methods=["POST"])
 def stop_capture():
     """Stop the background sniffing thread and save the CSV."""
-    global capturing
+    global capturing, connections
     if capturing:
         capturing = False
         save_to_csv()  # automatically save the CSV on stop
     filename = "network_traffic.csv"
-    return send_file(filename, as_attachment=True)
+    connections.clear()  # Clear all connections after saving
+    return redirect(url_for("index"))
 
 @app.route("/download_csv")
 def download_csv():
     """Regenerate (or reuse) the CSV file and return it for download."""
+    global connections
     filename = "network_traffic.csv"
     save_to_csv(filename)
+    connections.clear()  # Clear all connections after saving
     return send_file(filename, as_attachment=True)
+
+@app.route("/get_table_data")
+def get_table_data():
+    """Return the current table data as JSON for AJAX requests."""
+    table_data = []
+    for (src_ip, dst_ip, src_port, dst_port, protocol), data in connections.items():
+        if data['start_time'] is None:
+            continue
+        duration = data['end_time'] - data['start_time']
+        out_bytes = data['out_bytes']
+        in_bytes = data['in_bytes']
+        tot_pkts = data['tot_pkts']
+        tot_bytes = out_bytes + in_bytes
+        
+        if duration > 0:
+            bps = tot_bytes / duration
+            bpp = tot_bytes / tot_pkts if tot_pkts > 0 else 0
+            pps = tot_pkts / duration
+        else:
+            bps = 0
+            bpp = 0
+            pps = 0
+        
+        if in_bytes > 0:
+            ratio = out_bytes / in_bytes
+        else:
+            ratio = float('inf')
+        
+        state_flags = ", ".join(data['state'])
+        timestamp_str = datetime.fromtimestamp(data['end_time']).strftime('%Y-%m-%d %H:%M:%S')
+
+        table_data.append({
+            "src_ip": src_ip,
+            "dst_ip": dst_ip,
+            "src_port": src_port,
+            "dst_port": dst_port,
+            "protocol": protocol,
+            "duration": f"{duration:.2f}",
+            "out_bytes": out_bytes,
+            "in_bytes": in_bytes,
+            "tot_pkts": tot_pkts,
+            "tot_bytes": tot_bytes,
+            "bytes_per_sec": f"{bps:.2f}",
+            "bytes_per_pkt": f"{bpp:.2f}",
+            "pkts_per_sec": f"{pps:.2f}",
+            "ratio_out_in": f"{ratio:.2f}" if ratio != float('inf') else "inf",
+            "state_flags": state_flags,
+            "timestamp": timestamp_str
+        })
+    return {"table_data": table_data}
 
 def run_server(host="0.0.0.0", port=8080):
     # Must run with privileges (e.g., 'sudo') to allow Scapy to capture packets
