@@ -7,8 +7,12 @@ import threading
 import os
 from datetime import datetime
 
-app = Flask(__name__, template_folder="templates")
+# python -m venv venv
+# venv\Scripts\activate
+# pip install -r requirements.txt 
+# deactivate
 
+app = Flask(__name__, template_folder="templates")
 # ----------------------------
 # Global Data Structures
 # ----------------------------
