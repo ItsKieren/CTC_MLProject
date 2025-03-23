@@ -141,10 +141,10 @@
 
             <div class="controls">
                 <!-- Replace status indicator and buttons with single toggle button -->
-                <button id="toggleCapture" class="btn btn-primary">
+                <button id="toggleCapture" class="btn btn-success">
                     Start Capture
                 </button>
-                <a href="/download_csv" class="btn btn-success ms-3">Download CSV</a>
+                <a href="/download_csv" class="btn btn-secondary ms-7">Download CSV</a>
             </div>
         </header>
 
@@ -154,11 +154,11 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4>Statistics</h4>
                         <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#statsSection"
-                            aria-expanded="false">
-                            <i class="bi bi-chevron-up"></i>
+                            aria-expanded="true">
+                            <i class="bi bi-chevron-down"></i>
                         </button>
                     </div>
-                    <div class="collapse mb-5" id="statsSection">
+                    <div class="collapse show mb-5" id="statsSection">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="card ">
@@ -312,12 +312,12 @@
             const toggleButton = document.getElementById('toggleCapture');
             if (isActive) {
                 toggleButton.textContent = 'Stop Capture';
-                toggleButton.classList.remove('btn-primary');
+                toggleButton.classList.remove('btn-success');
                 toggleButton.classList.add('btn-danger');
             } else {
                 toggleButton.textContent = 'Start Capture';
                 toggleButton.classList.remove('btn-danger');
-                toggleButton.classList.add('btn-primary');
+                toggleButton.classList.add('btn-success');
             }
         }
 
