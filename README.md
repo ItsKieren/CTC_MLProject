@@ -97,18 +97,18 @@ We welcome contributions! Please follow these steps:
 | Backend | Owin Rojas |
 | QA & Documentation | Eldwin C |
 
-## 🙏 Credits
+## 🙏 Credits  
 **DReLAB Dataset** (Deep REinforcement Learning Adversarial Botnet dataset) DOI: 10.17632/nf22d786tj.1  
-**joblib**
-**numpy**
-**pandas**
-**python-dateutil**
-**pytz**
-**scikit-learn**
-**scipy**
-**six**
-**threadpoolctl**
-**tzdata**
+**joblib**  
+**numpy**  
+**pandas**  
+**python-dateutil**  
+**pytz**  
+**scikit-learn**  
+**scipy**  
+**six**  
+**threadpoolctl**  
+**tzdata**  
 **watchdog**
 
 ## 📄 License
