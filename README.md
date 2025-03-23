@@ -65,7 +65,7 @@ Traditional botnet detection methods rely on signature-based or heuristic approa
 
 4. **Unzip Model**:
    ```bash
-   Unzip CTC_MLProeject/models/random_forest_model.7z using 7zip
+   7z x CTC_MLProeject/models/random_forest_model.7z
    ```
 
 5. **Run Application**:
