@@ -1,44 +1,96 @@
-# Botnet Detection Tool
-Botnet Detection Tool is an AI-driven cybersecurity application designed to detect and alert users about potential botnet activity within their network. It uses machine learning algorithms to analyze network traffic, detect abnormal behavior, and provide real-time alerts.
+# 🛡️ Botnet Detection Tool
 
-### User Stories
+## 📝 Summary
+The **Botnet Detection Tool** is an AI-driven cybersecurity application designed to detect and alert users about potential botnet activity within their network. It leverages a Random Forest classifier to analyze network traffic patterns, detect abnormal behavior, and provide real-time alerts with suspicious IP tracking.
 
-#### The following functionality is completed:
+## 🎯 Mission Statement
+Our mission is to provide a robust, adaptive, and user-friendly solution for detecting botnet activity in real-time, helping organizations and individuals secure their networks against evolving cyber threats.
 
-- [ x ] User can start network traffic capture to analyze incoming and outgoing network data in real-time, allowing for proactive threat monitoring.
-- [ x ] User can stop network traffic capture to halt data collection.
-- [ x ] User can download network traffic data in CSV format for further analysis.
-- [ x ] User can visualize traffic patterns using graphs showing traffic trends, protocol distribution, and port category distribution.
-- [ x ] User can view real-time alerts on botnet activities (potential threats).
-- [ x ] User can view detailed packet information, such as packet size, source/destination IPs, and protocol type.
-- [ x ] Real-time status indicators show the capture status and active botnet detection.
-  
-### App Walkthough GIF
-Here's a walkthrough of the implemented user stories:
+## ⚠️ The Problem
+Botnet attacks are a significant threat to cybersecurity, often used for:
+- Large-scale Distributed Denial-of-Service (DDoS) attacks
+- Data theft
+- Other malicious activities
 
-<img src="https://github.com/ChloeZhang1/FlixsterPart2/blob/main/Fix2WalkThrough.gif" width=250><br>
+These attacks involve thousands or even millions of compromised devices, making detection difficult due to the vast volume and complexity of traffic.
 
-GIF created with LiceCap
+Traditional botnet detection methods rely on signature-based or heuristic approaches, which can be ineffective against evolving botnet tactics. This tool addresses these challenges by using machine learning to analyze network traffic and distinguish between normal and malicious behavior.
 
-### Notes
-Challenges Encountered:
+## ✨ Features
+| Feature | Description |
+|---------|-------------|
+| 🔍 Real-time Monitoring | Continuously monitor network traffic files in a specified directory |
+| 📊 Queue System | Handle multiple files simultaneously with queue-based processing |
+| 🚫 Suspicious IP Tracking | Track and log potentially malicious IP addresses with timestamps |
+| 📁 CSV Export | Process and save analyzed network traffic data in CSV format |
+| 🤖 Automated Processing | Automatically detect and process new network traffic files |
+| 🛠️ Error Handling | Robust error handling with retry mechanisms |
+| 📈 Progress Tracking | Real-time progress indicators and timing information |
 
-- Processing real-time network traffic efficiently without causing performance slowdowns requires optimizing data collection and minimizing system resource usage
+## 🌟 How Are We Unique?
+- **AI/ML-Driven Detection**: Uses a Random Forest classifier trained on real-world network traffic data
+- **Real-time Processing**: Monitors directory for new files and processes them automatically
+- **Comprehensive IP Tracking**: Maintains a database of suspicious IPs for threat analysis
+- **Robust Error Handling**: Multiple retry attempts and graceful error recovery
+- **User-friendly Output**: Clear, organized console output with visual indicators
 
-- Graphs and dashboards need to update dynamically while remaining responsive, as network traffic could generate thousands of packets per second.
+## 🚀 Steps to Use
+1. **Install Dependencies**:
+   ```bash
+   # Ensure Python 3.10.12 is installed
+   pip install -r requirements.txt
+   ```
 
-- Detecting botnet activity involves training models to distinguish between normal and malicious network behavior. It is important that flagging normal activity as botnet-related (false positives) or failing to detect actual threats (false negatives) is reduced.
+2. **Clone Repository**:
+   ```bash
+   git clone <repository-url>
+   cd <repository-folder>
+   ```
 
-### Open-source libraries used
-- Scapy: For packet sniffing and network traffic analysis.
+3. **Set Up Environment**:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # Linux/macOS
+   .\venv\Scripts\activate   # Windows
+   ```
 
-- Flask: For building the web interface.
-- Chart.js: For visiliazion
-- Collections: For efficiently managing network connection data.
+4. **Run Application**:
+   ```bash
+   python monitor.py
+   ```
 
-- CSV: For saving and analyzing captured network traffic data.
+## 🔍 Troubleshooting
+| Issue | Solution |
+|-------|----------|
+| Performance Slowdowns | Ensure sufficient system resources |
+| False Positives/Negatives | Update ML model with new data |
+| Installation Issues | Verify Python and dependencies |
 
-- Sklearn (for AI/ML): For implementing machine learning algorithms that help detect botnet behavior in network traffic.
+## 🤝 Contributing
+We welcome contributions! Please follow these steps:
+1. Fork the repository
+2. Create a new branch for your feature or bugfix
+3. Submit a pull request with a detailed description of your changes
 
-### License
-Copyright [2025] [404NotFound Team - Hackathon @ Concordia University 2025]
+## 👥 Team
+| Role | Member |
+|------|--------|
+| AI Designer | Andrew Sykes |
+| Front End | Chloe Zhang |
+| Backend | Owin Rojas |
+| QA & Documentation | Eldwin C |
+
+## 🙏 Credits
+- **Pandas & NumPy**: Core data processing and numerical operations
+- **Scikit-learn**: Machine learning implementation (Random Forest Classifier and Label Encoding)
+- **Joblib**: Model and encoder serialization
+- **Watchdog**: Real-time file system monitoring
+- **Pathlib**: Path manipulation and directory creation
+- **Threading**: Multi-threaded processing for file handling
+- **Queue**: Thread-safe queue implementation for file processing
+- **Logging**: Structured logging system
+- **Datetime**: Timestamp handling and time-based operations
+- **OS**: File system operations and path management
+
+## 📄 License
+© 2025 | 404NotFound Team - Hackathon @ Concordia University 2025
