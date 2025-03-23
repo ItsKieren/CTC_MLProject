@@ -96,6 +96,7 @@ We welcome contributions! Please follow these steps:
 | Front End | Chloe Zhang |
 | Backend | Owin Rojas |
 | QA & Documentation | Eldwin C |
+| Data Processing | Kieren A |
 
 ## 🙏 Credits  
 **DReLAB Dataset** (Deep REinforcement Learning Adversarial Botnet dataset) DOI: 10.17632/nf22d786tj.1  
