@@ -7,12 +7,8 @@ import threading
 import os
 from datetime import datetime
 
-# python -m venv venv
-# venv\Scripts\activate
-# pip install -r requirements.txt 
-# deactivate
-
 app = Flask(__name__, template_folder="templates")
+
 # ----------------------------
 # Global Data Structures
 # ----------------------------
@@ -104,8 +100,9 @@ def sniff_packets():
         current_time = time.time()
         if current_time - last_save_time >= save_interval:
             try:
-                # Save current data with timestamp
-                filename = f"./scapy_packet_files/network_traffic_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+                # Save current data with new naming convention
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                filename = f"scapy_processed_files/processed_network_traffic-{timestamp}.csv"
                 save_to_csv(filename)
                 
                 # Clear the connections dictionary
