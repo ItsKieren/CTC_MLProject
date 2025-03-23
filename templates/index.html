@@ -1,36 +1,44 @@
 <!DOCTYPE html>
-<html data-bs-theme="dark">
+<html lang="en" data-bs-theme="dark">
+
 <head>
-    <title>Packet Capture</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Botnet Detection Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             padding: 20px;
         }
+
         .container {
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             min-height: 0;
             display: flex;
             flex-direction: column;
         }
+
         .controls {
             margin-bottom: 20px;
         }
+
         table {
             width: 100%;
             margin-top: 20px;
         }
+
         th {
             background-color: #f8f9fa;
         }
+
         .table-container {
             position: relative;
             min-height: 200px;
             overflow: hidden;
         }
+
         .loading {
             position: absolute;
             top: 50%;
@@ -39,33 +47,41 @@
             display: none;
             z-index: 1000;
         }
+
         .graph-container {
             margin: 30px 0;
             padding: 20px;
             border-radius: 8px;
             height: 400px;
             overflow: hidden;
+            background-color: white;
         }
+
         .graph-controls {
             margin-bottom: 15px;
         }
+
         .split-view {
             display: flex;
             gap: 20px;
             margin-top: 20px;
         }
-        .split-view > div {
+
+        .split-view>div {
             flex: 1;
             min-width: 0;
         }
+
         .table-section {
             height: calc(100vh - 200px);
             overflow: auto;
         }
+
         #trafficChart {
             width: 100% !important;
             height: 100% !important;
         }
+
         .card {
             height: auto;
             background-color: var(--bs-dark);
@@ -73,69 +89,118 @@
             transition: all 0.3s ease;
             margin-bottom: 1rem;
         }
+
         .card-body {
             padding: 1.5rem;
         }
+
         .table-responsive {
             overflow: auto;
             max-height: 600px;
         }
+
         .collapse {
             transition: height 0.35s ease;
             overflow: hidden;
         }
+
         .collapse:not(.show) {
             display: none;
         }
+
         .collapse.show {
             display: block;
         }
+
         .collapse.collapsing {
             height: 0;
             overflow: hidden;
         }
+
         .d-flex.flex-column.gap-4 {
             min-height: 0;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-          <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-            <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
-            <span class="fs-4">
-                Botnet Detection Tool
-                <img src=https://freedesignfile.com/image/preview/6348/botnet-clipart.png alt="Icon" style="width: 30px; height: 30px; vertical-align: middle; margin-right: 8px;">
+            <a href="/"
+                class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+                <svg class="bi me-2" width="40" height="32">
+                    <use xlink:href="#bootstrap"></use>
+                </svg>
+                <span class="fs-4">
+                    <h1>Botnet Detection Tool
+                        <img src=https://freedesignfile.com/image/preview/6348/botnet-clipart.png alt="Icon"
+                            style="width: 30px; height: 30px; vertical-align: middle; margin-right: 8px;">
+                    </h1>
                 </span>
-          </a>
+            </a>
 
-          <div class="controls">
-            <form action="/start" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-primary">Start Capture</button>
-            </form>
-            <form action="/stop" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-danger">Stop Capture</button>
-            </form>
-            <a href="/download_csv" class="btn btn-success ms-3">Download CSV</a>   
-            <!-- Status Indicator -->
-            <span id="statusIndicator" class="badge bg-secondary ms-3">Inactive</span>
-            <h4>System Resource Usage (e.g., CPU usage, memory usage).</h4>
-        </div>
-        <hr/>
+            <div class="controls">
+                <!-- Replace status indicator and buttons with single toggle button -->
+                <button id="toggleCapture" class="btn btn-primary">
+                    Start Capture
+                </button>
+                <a href="/download_csv" class="btn btn-success ms-3">Download CSV</a>
+            </div>
+        </header>
 
-        <div class="d-flex flex-column gap-4">
-            <div class="card">
-                <div class="card-body">
+        <div class="d-flex flex-column">
+            <div class="section">
+                <div class="section-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Connections Log</h2>
-                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#tableSection" aria-expanded="true">
+                        <h4>Statistics</h4>
+                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#statsSection"
+                            aria-expanded="false">
                             <i class="bi bi-chevron-up"></i>
                         </button>
                     </div>
-                    <div class="collapse show" id="tableSection">
+                    <div class="collapse mb-5" id="statsSection">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card ">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Total Connections</h5>
+                                        <p class="card-text display-6" id="totalConnections">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card ">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Suspicious Packets</h5>
+                                        <p class="card-text display-6" id="predictedAlerts">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card ">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Alert Ratio</h5>
+                                        <p class="card-text display-6" id="alertRatio">0%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4>Connections Log</h4>
+                        <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#tableSection"
+                            aria-expanded="false">
+                            <i class="bi bi-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div class="collapse" id="tableSection">
                         <div class="table-container">
-                            <div class="loading">
+                            <div class="loading" style="display: none;">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
@@ -162,28 +227,7 @@
                                             <th>Timestamp</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tableBody">
-                                        {% for row in table_data %}
-                                        <tr>
-                                            <td>{{ row.src_ip }}</td>
-                                            <td>{{ row.dst_ip }}</td>
-                                            <td>{{ row.src_port }}</td>
-                                            <td>{{ row.dst_port }}</td>
-                                            <td>{{ row.protocol }}</td>
-                                            <td>{{ row.duration }}</td>
-                                            <td>{{ row.out_bytes }}</td>
-                                            <td>{{ row.in_bytes }}</td>
-                                            <td>{{ row.tot_pkts }}</td>
-                                            <td>{{ row.tot_bytes }}</td>
-                                            <td>{{ row.bytes_per_sec }}</td>
-                                            <td>{{ row.bytes_per_pkt }}</td>
-                                            <td>{{ row.pkts_per_sec }}</td>
-                                            <td>{{ row.ratio_out_in }}</td>
-                                            <td>{{ row.state_flags }}</td>
-                                            <td>{{ row.timestamp }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
+                                    <tbody id="tableBody"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -191,15 +235,16 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-body">
+            <div class="section">
+                <div class="section-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Network Traffic</h2>
-                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#graphSection" aria-expanded="true">
+                        <h4>Network Traffic</h4>
+                        <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#graphSection"
+                            aria-expanded="false">
                             <i class="bi bi-chevron-up"></i>
                         </button>
                     </div>
-                    <div class="collapse show" id="graphSection">
+                    <div class="collapse" id="graphSection">
                         <div class="graph-controls">
                             <select id="graphType" class="form-select" style="width: auto; display: inline-block;">
                                 <option value="bytes">Total Bytes</option>
@@ -210,15 +255,45 @@
                             <button id="clearGraph" class="btn btn-secondary ms-2">Clear Graph</button>
                         </div>
                         <div class="graph-container">
-                            <canvas id="trafficChart"></canvas>
+                            <canvas id="trafficChart" width="1463" height="450"
+                                style="display: block; box-sizing: border-box; height: 360px; width: 1170px;"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="section">
+            <div class="section-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4>Alert Logs</h4>
+                    <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#logSection"
+                        aria-expanded="false">
+                        <i class="bi bi-chevron-up"></i>
+                    </button>
+                </div>
+                <div class="collapse" id="logSection">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Source IP</th>
+                                    <th>Destination IP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alertTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
     <script>
         let trafficChart = null;
         const maxDataPoints = 50; // Maximum number of data points to show
@@ -232,6 +307,62 @@
             }]
         };
 
+        // Replace status indicator functionality with toggle button
+        function updateToggleButton(isActive) {
+            const toggleButton = document.getElementById('toggleCapture');
+            if (isActive) {
+                toggleButton.textContent = 'Stop Capture';
+                toggleButton.classList.remove('btn-primary');
+                toggleButton.classList.add('btn-danger');
+            } else {
+                toggleButton.textContent = 'Start Capture';
+                toggleButton.classList.remove('btn-danger');
+                toggleButton.classList.add('btn-primary');
+            }
+        }
+
+        // Update checkCaptureStatus function
+        function checkCaptureStatus() {
+        updateTable();
+            fetch('/get_capture_status')
+                .then(response => response.json())
+                .then(data => {
+                    updateToggleButton(data.is_capturing);
+                })
+                .catch(error => console.error('Error checking capture status:', error));
+        }
+
+        // Add click handler for toggle button
+        document.getElementById('toggleCapture').addEventListener('click', function() {
+            const isActive = this.classList.contains('btn-danger');
+            const endpoint = isActive ? '/stop' : '/start';
+            
+            fetch(endpoint, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Initialize on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initial status check
+            checkCaptureStatus();
+            // Check status every second
+            setInterval(checkCaptureStatus, 1000);
+
+            // Initial table update
+            updateTable();
+            // Update table every 2 seconds
+            setInterval(updateTable, 2000);
+
+            // Initial alerts update
+            updateAlerts();
+            // Update alerts every 2 seconds
+            setInterval(updateAlerts, 2000);
+        });
+
         function initChart() {
             const ctx = document.getElementById('trafficChart').getContext('2d');
             trafficChart = new Chart(ctx, {
@@ -242,11 +373,36 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e0e0e0'
+                            },
+                            ticks: {
+                                color: '#000000'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#e0e0e0'
+                            },
+                            ticks: {
+                                color: '#000000'
+                            }
                         }
                     },
                     animation: {
                         duration: 0 // Disable animation for better performance
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#000000'
+                            }
+                        },
+                        title: {
+                            color: '#000000'
+                        }
                     }
                 }
             });
@@ -259,7 +415,7 @@
 
             const timestamps = data.map(row => row.timestamp);
             const values = data.map(row => {
-                switch(metric) {
+                switch (metric) {
                     case 'bytes':
                         return parseFloat(row.tot_bytes);
                     case 'packets':
@@ -292,7 +448,7 @@
         }
 
         function getMetricTitle(metric) {
-            switch(metric) {
+            switch (metric) {
                 case 'bytes':
                     return 'Total Bytes Over Time';
                 case 'packets':
@@ -309,9 +465,9 @@
         function updateTable() {
             const loading = document.querySelector('.loading');
             const tableBody = document.getElementById('tableBody');
-            
+
             loading.style.display = 'block';
-            
+
             fetch('/get_table_data')
                 .then(response => response.json())
                 .then(data => {
@@ -346,8 +502,53 @@
                 });
         }
 
+        function addAlertLog(severity, message) {
+            const alertMessages = document.getElementById("alertMessages");
+            const timestamp = new Date().toLocaleTimeString();
+            const alertClass = severity === "ERROR" ? "alert-danger" : severity === "WARNING" ? "alert-warning" : "alert-info";
+
+            const logEntry = document.createElement("li");
+            logEntry.className = `alert ${alertClass} p-2 mb-2`;
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+
+            alertMessages.prepend(logEntry); // New logs appear at the top
+        }
+
+        function showToast(severity, message) {
+            const toastContainer = document.getElementById("toastContainer");
+            const timestamp = new Date().toLocaleTimeString();
+            const toastClass = severity === "ERROR" ? "text-bg-danger" : severity === "WARNING" ? "text-bg-warning" : "text-bg-info";
+
+            const toast = document.createElement("div");
+            toast.className = `toast show ${toastClass}`;
+            toast.setAttribute("role", "alert");
+            toast.innerHTML = `
+        <div class="toast-header">
+            <strong class="me-auto">${severity}</strong>
+            <small>${timestamp}</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">${message}</div>
+    `;
+
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.remove(), 500);
+            }, 5000); // Auto-dismiss after 5 seconds
+        }
+
+
+        // Example usage:
+        showToast("INFO", "Botnet scanning started.");
+        showToast("WARNING", "High number of connections detected.");
+        showToast("ERROR", "Botnet attack detected!");
+
+
+
         // Event listeners
-        document.getElementById('graphType').addEventListener('change', function() {
+        document.getElementById('graphType').addEventListener('change', function () {
             const selectedMetric = this.value;
             fetch('/get_table_data')
                 .then(response => response.json())
@@ -356,7 +557,7 @@
                 });
         });
 
-        document.getElementById('clearGraph').addEventListener('click', function() {
+        document.getElementById('clearGraph').addEventListener('click', function () {
             if (trafficChart) {
                 chartData.labels = [];
                 chartData.datasets[0].data = [];
@@ -364,25 +565,38 @@
             }
         });
 
-        // Initialize chart
-        initChart();
+        // Update the updateAlerts function to include statistics
+        function updateAlerts() {
+            fetch('/get_alerts')
+                .then(response => response.json())
+                .then(data => {
+                    const alertTableBody = document.getElementById('alertTableBody');
+                    alertTableBody.innerHTML = data.alerts.map(alert => `
+                        <tr>
+                            <td>${alert.src_ip}</td>
+                            <td>${alert.dst_ip}</td>
+                        </tr>
+                    `).join('');
 
-        // Update table and chart every 2 seconds
-        setInterval(updateTable, 2000);
+                    // Update statistics
+                    document.getElementById('totalConnections').textContent = data.stats.total_connections;
+                    document.getElementById('predictedAlerts').textContent = data.stats.predicted_alerts;
+                    document.getElementById('alertRatio').textContent = `${(data.stats.alert_ratio * 100).toFixed(2)}%`;
+                })
+                .catch(error => console.error('Error fetching alerts:', error));
+        }
 
         // Add collapse icon rotation
         document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const icon = this.querySelector('.bi');
-                if (this.getAttribute('aria-expanded') === 'true') {
-                    icon.classList.remove('bi-chevron-up');
-                    icon.classList.add('bi-chevron-down');
-                } else {
-                    icon.classList.remove('bi-chevron-down');
-                    icon.classList.add('bi-chevron-up');
-                }
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                icon.classList.remove(isExpanded ? 'bi-chevron-up' : 'bi-chevron-down');
+                icon.classList.add(isExpanded ? 'bi-chevron-down' : 'bi-chevron-up');
             });
         });
+
     </script>
 </body>
+
 </html>

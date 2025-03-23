@@ -324,9 +324,6 @@ def get_alerts():
         }
     }
 
-def run_server(host="0.0.0.0", port=8080):
-    # Must run with privileges (e.g., 'sudo') to allow Scapy to capture packets
-    app.run(host=host, port=port, debug=False)
 
 if __name__ == "__main__":
-    run_server()
+    app.run()
