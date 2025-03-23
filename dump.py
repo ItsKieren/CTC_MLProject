@@ -93,8 +93,30 @@ def packet_callback(packet):
 
 def sniff_packets():
     """Repeatedly sniff packets in short intervals while 'capturing' is True."""
+    last_save_time = time.time()
+    save_interval = 15  # Save every 15 seconds
+    
     while capturing:
+        # Sniff packets for 5 seconds
         sniff(prn=packet_callback, timeout=5, store=0)
+        
+        # Check if it's time to save
+        current_time = time.time()
+        if current_time - last_save_time >= save_interval:
+            try:
+                # Save current data with timestamp
+                filename = f"./scapy_packet_files/network_traffic_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+                save_to_csv(filename)
+                
+                # Clear the connections dictionary
+                connections.clear()
+                
+                # Update last save time
+                last_save_time = current_time
+                
+                print(f"Auto-saved data to {filename}")  # Debug log
+            except Exception as e:
+                print(f"Error during auto-save: {str(e)}")  # Debug log
 
 def save_to_csv(filename="network_traffic.csv"):
     """Save connection data to CSV (same columns/format as original)."""
@@ -328,6 +350,9 @@ def get_alerts():
         }
     }
 
+def run_server(host="0.0.0.0", port=8080):
+    # Must run with privileges (e.g., 'sudo') to allow Scapy to capture packets
+    app.run(host=host, port=port, debug=False)
 
 if __name__ == "__main__":
-    app.run()
+    run_server()
