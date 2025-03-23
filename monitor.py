@@ -178,7 +178,7 @@ def process_file(file_path, model, label_encoders, processed_dir, start_time):
         print(f"⏰ Started at: {datetime.now().strftime('%H:%M:%S')}")
         
         # Define output file path before any processing
-        file_number = file_path.split('network_traffic-')[-1].split('.')[0]
+        file_number = file_path.split('network_traffic_')[-1].split('.')[0]
         output_file = os.path.join(processed_dir, f'processed_network_traffic-{file_number}.csv')
         
         # Load and preprocess the data
