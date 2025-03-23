@@ -7,8 +7,12 @@ import threading
 import os
 from datetime import datetime
 
-app = Flask(__name__, template_folder="templates")
+# python -m venv venv
+# venv\Scripts\activate
+# pip install -r requirements.txt 
+# deactivate
 
+app = Flask(__name__, template_folder="templates")
 # ----------------------------
 # Global Data Structures
 # ----------------------------
@@ -90,7 +94,7 @@ def packet_callback(packet):
 def sniff_packets():
     """Repeatedly sniff packets in short intervals while 'capturing' is True."""
     last_save_time = time.time()
-    save_interval = 5  # Save every 15 seconds
+    save_interval = 15  # Save every 15 seconds
     
     while capturing:
         # Sniff packets for 5 seconds
@@ -100,13 +104,12 @@ def sniff_packets():
         current_time = time.time()
         if current_time - last_save_time >= save_interval:
             try:
-                # Save current data with new naming convention
-                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                filename = f"scapy_processed_files/processed_network_traffic-{timestamp}.csv"
+                # Save current data with timestamp
+                filename = f"./scapy_packet_files/network_traffic_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
                 save_to_csv(filename)
                 
                 # Clear the connections dictionary
-              #  connections.clear()
+                connections.clear()
                 
                 # Update last save time
                 last_save_time = current_time
@@ -347,9 +350,9 @@ def get_alerts():
         }
     }
 
-def run_server(host="0.0.0.0", port=8080):
-    # Must run with privileges (e.g., 'sudo') to allow Scapy to capture packets
-    app.run(host=host, port=port, debug=False)
+# def run_server(host="0.0.0.0", port=8080):
+#     # Must run with privileges (e.g., 'sudo') to allow Scapy to capture packets
+#     app.run(host=host, port=port, debug=False)
 
 if __name__ == "__main__":
-    run_server()
+    app.run()
