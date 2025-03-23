@@ -15,7 +15,9 @@ Botnet Detection Tool is an AI-driven cybersecurity application designed to dete
   
 ### App Walkthough GIF
 Here's a walkthrough of the implemented user stories:
+
 <img src="https://github.com/ChloeZhang1/FlixsterPart2/blob/main/Fix2WalkThrough.gif" width=250><br>
+
 GIF created with LiceCap
 
 ### Notes
