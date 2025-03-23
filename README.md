@@ -99,18 +99,30 @@ We welcome contributions! Please follow these steps:
 | Data Processing | Kieren A |
 
 ## 🙏 Credits  
-**DReLAB Dataset** (Deep REinforcement Learning Adversarial Botnet dataset) DOI: 10.17632/nf22d786tj.1  
-**joblib**  
-**numpy**  
-**pandas**  
-**python-dateutil**  
-**pytz**  
-**scikit-learn**  
-**scipy**  
-**six**  
-**threadpoolctl**  
-**tzdata**  
-**watchdog**
+## Credits
+
+This project uses the following technologies, libraries, and datasets:
+
+### Languages:
+- **Python**
+
+### Frameworks:
+- **Flask** – A micro web framework for Python.
+- **Bootstrap** – A front-end framework for responsive web design.
+
+### Libraries:
+- **Scapy** – A Python library used for network packet manipulation.
+- **Scikit-learn** – A machine learning library, used for building the Random Forest model.
+- **Pandas** – A library for data manipulation and analysis.
+- **NumPy** – A library for numerical computing in Python.
+- - **Chart.js** – A JavaScript library for creating charts and graphs.
+
+### Dataset:
+- **DReLAB** (Deep REinforcement Learning Adversarial Botnet dataset) – A dataset used for training the adversarial botnet detection model.
+
+### Machine Learning Model:
+- **Random Forest** – A machine learning algorithm used for classification tasks, implemented using Scikit-learn.
+
 
 ## 📄 License
 © 2025 | 404NotFound Team - Hackathon @ Concordia University 2025
