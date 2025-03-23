@@ -115,7 +115,7 @@ This project uses the following technologies, libraries, and datasets:
 - **Scikit-learn** – A machine learning library, used for building the Random Forest model.
 - **Pandas** – A library for data manipulation and analysis.
 - **NumPy** – A library for numerical computing in Python.
-- - **Chart.js** – A JavaScript library for creating charts and graphs.
+- **Chart.js** – A JavaScript library for creating charts and graphs.
 
 ### Dataset:
 - **DReLAB** (Deep REinforcement Learning Adversarial Botnet dataset) – A dataset used for training the adversarial botnet detection model.
