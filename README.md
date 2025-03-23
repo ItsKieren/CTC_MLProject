@@ -33,7 +33,7 @@ Challenges Encountered:
 - Scapy: For packet sniffing and network traffic analysis.
 
 - Flask: For building the web interface.
-
+- Chart.js: For visiliazion
 - Collections: For efficiently managing network connection data.
 
 - CSV: For saving and analyzing captured network traffic data.
