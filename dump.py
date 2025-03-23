@@ -4,6 +4,7 @@ from collections import defaultdict
 import time
 import csv
 import threading
+import os
 from datetime import datetime
 
 app = Flask(__name__, template_folder="templates")
@@ -193,7 +194,7 @@ def index():
             "timestamp": timestamp_str
         })
 
-    return render_template("index.html", table_data=table_data)
+    return render_template("index.html", table_data=table_data, is_capturing=capturing)
 
 @app.route("/start", methods=["POST"])
 def start_capture():
@@ -203,7 +204,8 @@ def start_capture():
         capturing = True
         capture_thread = threading.Thread(target=sniff_packets, daemon=True)
         capture_thread.start()
-    return redirect(url_for("index"))
+        return {"status": "success", "message": "Capture started"}
+    return {"status": "success", "message": "Capture already running"}
 
 @app.route("/stop", methods=["POST"])
 def stop_capture():
@@ -211,10 +213,15 @@ def stop_capture():
     global capturing, connections
     if capturing:
         capturing = False
-        save_to_csv()  # automatically save the CSV on stop
-    filename = "network_traffic.csv"
-    connections.clear()  # Clear all connections after saving
-    return redirect(url_for("index"))
+        filename = f"./scapy_packet_files/network_traffic_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        save_to_csv(filename)  # Save with timestamp in filename
+        connections.clear()  # Clear all connections after saving
+        # remove files that have already been processed scapy_processed_files
+        for file in os.listdir("./scapy_processed_files"):
+            os.remove(os.path.join("./scapy_processed_files", file))
+
+        return {"status": "success", "message": f"Capture stopped and saved to {filename}"}
+    return {"status": "success", "message": "Capture already stopped"}
 
 @app.route("/download_csv")
 def download_csv():
@@ -274,6 +281,48 @@ def get_table_data():
             "timestamp": timestamp_str
         })
     return {"table_data": table_data}
+
+@app.route("/get_capture_status")
+def get_capture_status():
+    """Return the current capture status as JSON."""
+    global capturing
+    return {"is_capturing": capturing}
+
+# alert route
+@app.route("/get_alerts")
+def get_alerts():
+    """Return the current alerts as JSON."""
+    alerts = []
+    total_connections = 0
+    predicted_alerts = 0
+    try:
+        for file in os.listdir("scapy_processed_files"):
+            if file.endswith(".csv"):
+                file_path = os.path.join("scapy_processed_files", file)
+                print(f"Processing file: {file_path}")  # Debug log
+                with open(file_path, 'r') as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        total_connections += 1
+                        if row.get('Prediction') == '1':
+                            predicted_alerts += 1
+                            alerts.append({
+                                'src_ip': row.get('Src IP', 'N/A'),
+                                'dst_ip': row.get('Dst IP', 'N/A'),
+                            })
+    except Exception as e:
+        print(f"Error processing alerts: {str(e)}")  # Debug log
+    
+    ratio = predicted_alerts / total_connections if total_connections > 0 else 0
+    
+    return {
+        "alerts": alerts,
+        "stats": {
+            "total_connections": total_connections,
+            "predicted_alerts": predicted_alerts,
+            "alert_ratio": ratio
+        }
+    }
 
 def run_server(host="0.0.0.0", port=8080):
     # Must run with privileges (e.g., 'sudo') to allow Scapy to capture packets
