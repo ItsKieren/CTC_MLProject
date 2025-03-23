@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Packet Capture</title>
+</head>
+<body>
+    <h1>Packet Capture</h1>
+    <form action="/start" method="post" style="display:inline;">
+        <button type="submit">Start Capture</button>
+    </form>
+    <form action="/stop" method="post" style="display:inline;">
+        <button type="submit">Stop Capture</button>
+    </form>
+    <a href="/download_csv" style="margin-left:20px;">Download CSV</a>
+    <hr/>
+
+    <h2>Current Connections (in-memory)</h2>
+    <table border="1" cellpadding="5" cellspacing="0">
+        <tr>
+            <th>Src IP</th>
+            <th>Dst IP</th>
+            <th>Src Port</th>
+            <th>Dst Port</th>
+            <th>Protocol</th>
+            <th>Duration (s)</th>
+            <th>Out Bytes</th>
+            <th>In Bytes</th>
+            <th>Total Packets</th>
+            <th>Total Bytes</th>
+            <th>Bytes/sec</th>
+            <th>Bytes/pkt</th>
+            <th>Pkts/sec</th>
+            <th>Ratio Out/In</th>
+            <th>State Flags</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for row in table_data %}
+        <tr>
+            <td>{{ row.src_ip }}</td>
+            <td>{{ row.dst_ip }}</td>
+            <td>{{ row.src_port }}</td>
+            <td>{{ row.dst_port }}</td>
+            <td>{{ row.protocol }}</td>
+            <td>{{ row.duration }}</td>
+            <td>{{ row.out_bytes }}</td>
+            <td>{{ row.in_bytes }}</td>
+            <td>{{ row.tot_pkts }}</td>
+            <td>{{ row.tot_bytes }}</td>
+            <td>{{ row.bytes_per_sec }}</td>
+            <td>{{ row.bytes_per_pkt }}</td>
+            <td>{{ row.pkts_per_sec }}</td>
+            <td>{{ row.ratio_out_in }}</td>
+            <td>{{ row.state_flags }}</td>
+            <td>{{ row.timestamp }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
