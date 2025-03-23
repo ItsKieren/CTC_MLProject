@@ -90,7 +90,7 @@ def packet_callback(packet):
 def sniff_packets():
     """Repeatedly sniff packets in short intervals while 'capturing' is True."""
     last_save_time = time.time()
-    save_interval = 15  # Save every 15 seconds
+    save_interval = 5  # Save every 15 seconds
     
     while capturing:
         # Sniff packets for 5 seconds
@@ -106,7 +106,7 @@ def sniff_packets():
                 save_to_csv(filename)
                 
                 # Clear the connections dictionary
-                connections.clear()
+              #  connections.clear()
                 
                 # Update last save time
                 last_save_time = current_time
