@@ -52,8 +52,8 @@ Traditional botnet detection methods rely on signature-based or heuristic approa
 
 2. **Clone Repository**:
    ```bash
-   git clone <repository-url>
-   cd <repository-folder>
+   git clone git@github.com:ItsKieren/CTC_MLProject.git
+   cd CTC_MLProject
    ```
 
 3. **Set Up Environment**:
@@ -65,8 +65,11 @@ Traditional botnet detection methods rely on signature-based or heuristic approa
 
 4. **Run Application**:
    ```bash
+   python dump.py
    python monitor.py
    ```
+
+
 
 ## 🔍 Troubleshooting
 | Issue | Solution |
@@ -92,6 +95,8 @@ We welcome contributions! Please follow these steps:
 ## 🙏 Credits
 **DReLAB Dataset** (Deep REinforcement Learning Adversarial Botnet dataset)  
 DOI: 10.17632/nf22d786tj.1  
+Published: December 9, 2020  
+Contributors: Andrea Venturi, Michele Colajanni
 
 ## 📄 License
 © 2025 | 404NotFound Team - Hackathon @ Concordia University 2025
