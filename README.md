@@ -90,16 +90,8 @@ We welcome contributions! Please follow these steps:
 | QA & Documentation | Eldwin C |
 
 ## 🙏 Credits
-- **Pandas & NumPy**: Core data processing and numerical operations
-- **Scikit-learn**: Machine learning implementation (Random Forest Classifier and Label Encoding)
-- **Joblib**: Model and encoder serialization
-- **Watchdog**: Real-time file system monitoring
-- **Pathlib**: Path manipulation and directory creation
-- **Threading**: Multi-threaded processing for file handling
-- **Queue**: Thread-safe queue implementation for file processing
-- **Logging**: Structured logging system
-- **Datetime**: Timestamp handling and time-based operations
-- **OS**: File system operations and path management
+**DReLAB Dataset** (Deep REinforcement Learning Adversarial Botnet dataset)  
+DOI: 10.17632/nf22d786tj.1  
 
 ## 📄 License
 © 2025 | 404NotFound Team - Hackathon @ Concordia University 2025
