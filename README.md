@@ -1,49 +1,19 @@
-# 🛡️ Botnet Detection Tool
+# CrackShark
 
-## 📝 Summary
-The **Botnet Detection Tool** is an AI-driven cybersecurity application designed to detect and alert users about potential botnet activity within their network. It leverages a Random Forest classifier to analyze network traffic patterns, detect abnormal behavior, and provide real-time alerts with suspicious IP tracking. Our tool processes network traffic data in real-time, utilizing advanced machine learning algorithms to identify potential threats and malicious activities. The system maintains a comprehensive database of suspicious IPs and provides detailed analytics through an intuitive console interface. With features like queue-based processing, automated file handling, and robust error recovery, this tool offers a complete solution for network security professionals and organizations looking to protect their infrastructure from botnet threats.
+## Summary
+**CrackShark** is an AI-driven cybersecurity tool designed to detect potential botnet activity and alert sysadmins to enact change. Additionally, CrackSharp is able to save IP addresses to a database of known botnets which can be used to block incoming traffic temporarily or permanently. The AI model behind this uses a Random Forest classification algorithm in order to determine if a subset of internet traffic packet data follows similar patterns to the labeled training data. Overall CrackSharp offers a complete solution for network security professionals or organizations looking to protect their infrastructure from DDOS or DOS attacks popular in the modern age. 
 
-## 🎯 Mission Statement
-Our mission is to provide a robust, adaptive, and user-friendly solution for detecting botnet activity in real-time, helping organizations and individuals secure their networks against evolving cyber threats. We strive to:
-- Empower security professionals with advanced AI-driven detection capabilities
-- Reduce false positives through sophisticated machine learning algorithms
-- Provide comprehensive threat intelligence through detailed IP tracking and analysis
-- Ensure seamless integration into existing security workflows
-- Maintain high performance and reliability through robust error handling
-- Adapt to emerging threats through continuous model updates
-- Make advanced security tools accessible to organizations of all sizes
+## Mission Statement
+Our mission is to provide a lightweight, open-source, and user-friendly solution for detecting botnet activity in real-time, helping organizations and individuals secure their networks against persistent cyber threats.
 
-By combining cutting-edge technology with user-friendly design, we aim to create a more secure digital environment where organizations can confidently manage and protect their network infrastructure against increasingly sophisticated botnet attacks.
+## Features
+- Real-time automated network monitoring 
+- Suspicious IP Tracking
+- Process and save analyzed network traffic data in house
+- Queue based log analysis
+- GUI based concurrent visualization
 
-## ⚠️ The Problem
-Botnet attacks are a significant threat to cybersecurity, often used for:
-- Large-scale Distributed Denial-of-Service (DDoS) attacks
-- Data theft
-- Other malicious activities
-
-These attacks involve thousands or even millions of compromised devices, making detection difficult due to the vast volume and complexity of traffic.
-
-Traditional botnet detection methods rely on signature-based or heuristic approaches, which can be ineffective against evolving botnet tactics. This tool addresses these challenges by using machine learning to analyze network traffic and distinguish between normal and malicious behavior.
-
-## ✨ Features
-| Feature | Description |
-|---------|-------------|
-| 🔍 Real-time Monitoring | Continuously monitor network traffic files in a specified directory |
-| 📊 Queue System | Handle multiple files simultaneously with queue-based processing |
-| 🚫 Suspicious IP Tracking | Track and log potentially malicious IP addresses with timestamps |
-| 📁 CSV Export | Process and save analyzed network traffic data in CSV format |
-| 🤖 Automated Processing | Automatically detect and process new network traffic files |
-| 🛠️ Error Handling | Robust error handling with retry mechanisms |
-| 📈 Progress Tracking | Real-time progress indicators and timing information |
-
-## 🌟 How Are We Unique?
-- **AI/ML-Driven Detection**: Uses a Random Forest classifier trained on real-world network traffic data
-- **Real-time Processing**: Monitors directory for new files and processes them automatically
-- **Comprehensive IP Tracking**: Maintains a database of suspicious IPs for threat analysis
-- **Robust Error Handling**: Multiple retry attempts and graceful error recovery
-- **User-friendly Output**: Clear, organized console output with visual indicators
-
-## 🚀 Steps to Use
+## Setup
 1. **Clone Repository**:
    ```bash
    git clone git@github.com:ItsKieren/CTC_MLProject.git
@@ -76,20 +46,21 @@ Traditional botnet detection methods rely on signature-based or heuristic approa
 
 
 
-## 🔍 Troubleshooting
+## Troubleshooting
 | Issue | Solution |
 |-------|----------|
-| Performance Slowdowns | Ensure sufficient system resources |
-| False Positives/Negatives | Update ML model with new data |
-| Installation Issues | Verify Python and dependencies |
+| Performance Slowdowns | Ensure sufficient allocated system resources as CrackShark is lightweight and should run efficiently on systems with as little as  2GB RAM and an Intel I3 CPU |
+| Installation Issues | Verify dependencies and ensure program is running as administrator|
+| False Positives/Negatives | Update ML model with new data with included training script |
 
-## 🤝 Contributing
+
+## Contributing
 We welcome contributions! Please follow these steps:
 1. Fork the repository
 2. Create a new branch for your feature or bugfix
 3. Submit a pull request with a detailed description of your changes
 
-## 👥 Team
+## Team | 404NotFound 
 | Role | Member |
 |------|--------|
 | AI Designer | Andrew Sykes |
@@ -98,31 +69,14 @@ We welcome contributions! Please follow these steps:
 | QA & Documentation | Eldwin C |
 | Data Processing | Kieren A |
 
-## 🙏 Credits  
 ## Credits
-
+  
 This project uses the following technologies, libraries, and datasets:
 
-### Languages:
-- **Python**
+**Languages -** Python, Bash\
+**Frameworks -** Flask, Bootstrap\
+**Libraries -** Scapy, Scikit-learn, Pandas, NumPy, Chart.js\
+**Training Dataset -** DReLAB (Deep REinforcement Learning Adversarial Botnet dataset)
 
-### Frameworks:
-- **Flask** – A micro web framework for Python.
-- **Bootstrap** – A front-end framework for responsive web design.
-
-### Libraries:
-- **Scapy** – A Python library used for network packet manipulation.
-- **Scikit-learn** – A machine learning library, used for building the Random Forest model.
-- **Pandas** – A library for data manipulation and analysis.
-- **NumPy** – A library for numerical computing in Python.
-- **Chart.js** – A JavaScript library for creating charts and graphs.
-
-### Dataset:
-- **DReLAB** (Deep REinforcement Learning Adversarial Botnet dataset) – A dataset used for training the adversarial botnet detection model.
-
-### Machine Learning Model:
-- **Random Forest** – A machine learning algorithm used for classification tasks, implemented using Scikit-learn.
-
-
-## 📄 License
-© 2025 | 404NotFound Team - Hackathon @ Concordia University 2025
+## License
+[MIT](LICENSE.md)
