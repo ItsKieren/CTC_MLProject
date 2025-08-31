@@ -1,17 +1,15 @@
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import LabelEncoder
 import joblib
 import logging
 import os
-from pathlib import Path
+import threading
 import time
+
+from pathlib import Path
 from datetime import datetime
-import glob
+from queue import Queue
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from queue import Queue
-import threading
 
 # Set up logging
 logging.basicConfig(
@@ -19,6 +17,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
+# Create helper functions
 def convert_port(port):
     """Convert port numbers to hexadecimal format"""
     try:
@@ -46,10 +45,7 @@ def convert_state(state):
 def convert_data(data):
     """Convert the input data to match the training data format"""
     try:
-        # Create a copy to avoid modifying the original
         df = data.copy()
-        
-        # Print original columns for debugging
         print("Original columns:", df.columns.tolist())
         
         # Convert column names to match training data
@@ -73,17 +69,13 @@ def convert_data(data):
         # Print columns after mapping for debugging
         print("Columns after mapping:", df.columns.tolist())
         
-        # Convert ports
+        # Convert df headers
         if 'Sport' in df.columns:
             df['Sport'] = df['Sport'].apply(convert_port)
         if 'Dport' in df.columns:
             df['Dport'] = df['Dport'].apply(convert_port)
-        
-        # Convert protocol
         if 'Proto' in df.columns:
             df['Proto'] = df['Proto'].apply(convert_protocol)
-        
-        # Convert state
         if 'State' in df.columns:
             df['State'] = df['State'].apply(convert_state)
         
@@ -91,21 +83,15 @@ def convert_data(data):
         required_columns = ['SrcBytes', 'TotBytes', 'TotPkts', 'dTos', 'sTos']
         for col in required_columns:
             if col not in df.columns:
-                if col in ['dTos', 'sTos']:
-                    df[col] = 0  # Default TOS values
-                else:
-                    df[col] = 0  # Default for other missing columns
+                df[col] = 0  # Default TOS values
         
-        # Define the exact order of columns as used in training
+        # Replicate order of columns as used in training
         training_columns = ['Dur', 'Proto', 'Sport', 'Dport', 'State', 'sTos', 'dTos', 'TotPkts', 'TotBytes', 'SrcBytes']
         
         # Reorder columns to match training order
         df = df[training_columns]
-        
-        # Fill missing values with 0
         df = df.fillna(0)
         
-        # Print final columns for debugging
         print("Final columns:", df.columns.tolist())
         
         return df
@@ -114,6 +100,7 @@ def convert_data(data):
         print("Available columns:", df.columns.tolist())
         raise
 
+# Class for each csv file
 class CSVHandler(FileSystemEventHandler):
     def __init__(self, queue):
         self.queue = queue
@@ -128,6 +115,7 @@ class CSVHandler(FileSystemEventHandler):
                 self.queue.put(event.src_path)
                 print(f"\n📥 Added to queue: {os.path.basename(event.src_path)}")
 
+# Load trained model
 def load_model_and_encoders(model_path='models/random_forest_model.joblib', 
                           encoders_path='models/label_encoders.joblib'):
     """Load the trained model and label encoders"""
@@ -138,6 +126,7 @@ def load_model_and_encoders(model_path='models/random_forest_model.joblib',
     label_encoders = joblib.load(encoders_path)
     return model, label_encoders
 
+# Preprocess
 def preprocess_data(data, label_encoders):
     """Preprocess input data similar to training phase"""
     try:
@@ -148,7 +137,6 @@ def preprocess_data(data, label_encoders):
         categorical_cols = ['Proto', 'State', 'Sport', 'Dport']
         for col in categorical_cols:
             if col in data.columns:
-                # Convert to string type first
                 data[col] = data[col].astype(str)
                 # Transform unknown values to most common training value
                 unknown_mask = ~data[col].isin(label_encoders[col].classes_)
@@ -160,22 +148,21 @@ def preprocess_data(data, label_encoders):
         return data
         
     except Exception as e:
-        print(f"\n❌ Error in preprocessing: {str(e)}")
+        print(f"\nError in preprocessing: {str(e)}")
         print("Available columns:", data.columns.tolist())
         raise
 
+# Process csv by running it into trained model
 def process_file(file_path, model, label_encoders, processed_dir, start_time):
     try:
-        print(f"\n==================================================")
-        print(f"📊 Processing Network Traffic File")
-        print(f"==================================================")
+        print(f"Processing Network Traffic File")
         
         # Calculate time elapsed since start
         elapsed_time = time.time() - start_time
-        print(f"⏱️ Time elapsed since start: {elapsed_time:.2f} seconds")
+        print(f"Time elapsed: {elapsed_time:.2f} seconds")
         
-        print(f"\n📁 File: {os.path.basename(file_path)}")
-        print(f"⏰ Started at: {datetime.now().strftime('%H:%M:%S')}")
+        print(f"\nFile: {os.path.basename(file_path)}")
+        print(f"Started at: {datetime.now().strftime('%H:%M:%S')}")
         
         # Define output file path before any processing
         file_number = file_path.split('network_traffic_')[-1].split('.')[0]
@@ -183,58 +170,50 @@ def process_file(file_path, model, label_encoders, processed_dir, start_time):
         
         # Load and preprocess the data
         data = pd.read_csv(file_path)
-        print(f"📈 Total flows analyzed: {len(data)}")
-        
-        # Preprocess the data
+        print(f"Total flows analyzed: {len(data)}")
         processed_data = preprocess_data(data, label_encoders)
         
         # Make predictions
         predictions = model.predict(processed_data)
         prediction_counts = pd.Series(predictions).map({0: 'Benign', 1: 'Malicious'}).value_counts()
         
-        print(f"\n==================================================")
-        print(f"🔍 Analysis Results")
-        print(f"==================================================")
+        print(f"Analysis Results")
         print(f"\nTraffic Classification:")
         for label, count in prediction_counts.items():
-            print(f"  • {label}: {count} flows")
+            print(f"{label}: {count} flows")
         
-        # Add checkmarks for benign traffic
         if len(prediction_counts) == 1 and prediction_counts.index[0] == 'Benign':
-            print("✓" * 50)
-            print("✅ All traffic appears to be benign")
-            print("✓" * 50)
+            print("- All traffic appears to be benign")
         else:
-            print("\n⚠️  ALERT: Potentially malicious traffic detected!")
-            print("!" * 50)
+            print("\n- ALERT: Potentially malicious traffic detected!")
         
         # Add predictions to the original data
         data['Prediction'] = predictions
         data.to_csv(output_file, index=False)
         
-        print(f"\n💾 Detailed results saved to: {output_file}")
+        print(f"\nDetailed results saved to: {output_file}")
         
         # Calculate processing time
         processing_time = time.time() - start_time
-        print(f"\n⏱️ Total processing time: {processing_time:.2f} seconds")
+        print(f"\nTotal processing time: {processing_time:.2f} seconds")
         
     except PermissionError:
-        print(f"\n⚠️  File is currently locked or in use: {os.path.basename(file_path)}")
-        print("⏳ Waiting 2 seconds before retrying...")
+        print(f"\n File is currently locked or in use: {os.path.basename(file_path)}")
+        print("Waiting 2 seconds before retrying...")
         time.sleep(2)
         try:
             # Retry the entire process
             data = pd.read_csv(file_path)
-            print(f"📈 Total flows analyzed: {len(data)}")
+            print(f"Total flows analyzed: {len(data)}")
             processed_data = preprocess_data(data, label_encoders)
             predictions = model.predict(processed_data)
             data['Prediction'] = predictions
             data.to_csv(output_file, index=False)
-            print(f"\n✅ Successfully processed file after retry")
+            print(f"\nSuccessfully processed file after retry")
         except Exception as retry_error:
-            print(f"\n❌ Error during retry: {str(retry_error)}")
+            print(f"\nError during retry: {str(retry_error)}")
     except Exception as e:
-        print(f"\n❌ Error processing file: {str(e)}")
+        print(f"\nError processing file: {str(e)}")
         print(f"File: {os.path.basename(file_path)}")
 
 def process_queue(queue, model, label_encoders, processed_dir, start_time):
@@ -246,31 +225,24 @@ def process_queue(queue, model, label_encoders, processed_dir, start_time):
         queue.task_done()
 
 def monitor_directory(directory):
-    print("\n==================================================")
-    print("🚀 Network Traffic Monitor")
-    print("==================================================")
-    print(f"\n📂 Monitoring directory: {os.path.abspath(directory)}")
-    print("⏳ Waiting for new network traffic files...")
-    print("💡 Press Ctrl+C to stop monitoring")
-    print("\n==================================================")
+    print("Network Traffic Monitor")
+    print(f"\nMonitoring directory: {os.path.abspath(directory)}")
+    print("Waiting for new network traffic files...")
+    print("Press Ctrl+C to stop monitoring")
     
     # Create processed directory if it doesn't exist
     processed_dir = 'scapy_processed_files'
     Path(processed_dir).mkdir(exist_ok=True)
     
-    print("\n==================================================")
-    print("📚 Loading Analysis Model")
-    print("==================================================")
+    print("Loading Analysis Model")
     
     # Load the model and encoders
     model = joblib.load('models/random_forest_model.joblib')
     label_encoders = joblib.load('models/label_encoders.joblib')
-    print("✅ Model loaded successfully!")
+    print("Model loaded successfully!")
     
-    print("\n==================================================")
-    print("🎯 Monitor Active")
-    print("==================================================")
-    print(f"\n👀 Watching for new files in: {directory}")
+    print("Monitor Active")
+    print(f"\nWatching for new files in: {directory}")
     
     # Create a queue for file processing
     file_queue = Queue()
@@ -294,14 +266,11 @@ def monitor_directory(directory):
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n==================================================")
-        print("🛑 Monitor Stopped")
-        print("==================================================")
+        print("Monitor Stopped")
         observer.stop()
         # Add poison pill to stop the processor thread
         file_queue.put(None)
         processor_thread.join()
-        print("\n👋 Thank you for using the Network Traffic Monitor!")
     
     observer.join()
 
