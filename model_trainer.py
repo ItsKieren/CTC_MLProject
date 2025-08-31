@@ -1,15 +1,18 @@
+import joblib
+import logging
+import os
 import pandas as pd
 import numpy as np
+
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import LabelEncoder
-import joblib
-import logging
-import os
-from pathlib import Path
 
-# Set up logging to document timestamps, errors, and messages
+
+
+# Set up timestamps, errors, and messages
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
@@ -17,26 +20,18 @@ logging.basicConfig(
 
 def main():
     try:
-        # Check if training dataset exists in the current directory
+        # Check if training dataset exists in the cur dir
         if not os.path.exists('./raw_labelled_flow.csv'):
             raise FileNotFoundError("Dataset file 'raw_labelled_flow.csv' not found in current directory")
 
-        # Load the dataset
+        # Load data
         logging.info("Loading dataset...")
         data = pd.read_csv('./raw_labelled_flow.csv')
-        
-        # Remove leading/trailing spaces from column names
         data.columns = data.columns.str.strip()
-        
-        # Drop the index column if it exists
         if 'Unnamed: 0' in data.columns:
             data = data.drop(columns=['Unnamed: 0'])
         
-        # Print dataset information
-        logging.info(f"Dataset shape: {data.shape}")
-        logging.info(f"Columns in the dataset: {data.columns.tolist()}")
-        
-        # Convert ports to strings for printing
+        # Convert ports to strings
         data['Sport'] = data['Sport'].astype(str)
         data['Dport'] = data['Dport'].astype(str)
         
@@ -47,21 +42,17 @@ def main():
         print("Source Ports:", sorted(data['Sport'].unique())[:10], "...")
         print("Destination Ports:", sorted(data['Dport'].unique())[:10], "...")
         
-        # Drop non-numerical columns that are less important for training, and difficult to train
+        # Drop unimportant non-numerical columns
         columns_to_drop = ['StartTime', 'SrcAddr', 'DstAddr', 'Dir']
         data = data.drop(columns=[col for col in columns_to_drop if col in data.columns])
-        
-        # Handle missing values in our dataset by filling missing values with 0
         data = data.fillna(0)
         
-        # Initialize dictionary to store label converted ports and other columns
         label_encoders = {}
         
         # Handle categorical data similar to ports
         categorical_cols = ['Proto', 'State', 'Sport', 'Dport']
         for col in categorical_cols:
             if col in data.columns:
-                # Convert to string type first
                 data[col] = data[col].astype(str)
                 label_encoders[col] = LabelEncoder()
                 data[col] = label_encoders[col].fit_transform(data[col])
@@ -86,14 +77,14 @@ def main():
         logging.info("Training model...")
         model.fit(X_train, y_train)
         
-        # Check for overfitting by comparing train and test accuracy
+        # Check for overfitting
         train_pred = model.predict(X_train)
         train_accuracy = accuracy_score(y_train, train_pred)
         
         test_pred = model.predict(X_test)
         test_accuracy = accuracy_score(y_test, test_pred)
         
-        # Print training overview with focus on overfitting
+        # Print training overview
         logging.info("\n=== Overfitting Check ===")
         logging.info(f"Training Accuracy: {train_accuracy:.4f}")
         logging.info(f"Test Accuracy: {test_accuracy:.4f}")
@@ -108,7 +99,7 @@ def main():
         print("\nClassification Report:")
         print(report)
         
-        # Print feature importance for prioratization
+        # Print feature importance
         feature_importance = pd.DataFrame({
             'Feature': X.columns,
             'Importance': model.feature_importances_
