@@ -1,22 +1,17 @@
-from flask import Flask, request, redirect, url_for, send_file, render_template
-from scapy.all import sniff, IP, TCP, UDP, Raw
-from collections import defaultdict
 import time
 import csv
 import threading
 import os
-from datetime import datetime
 
-# python -m venv venv
-# venv\Scripts\activate
-# pip install -r requirements.txt 
-# deactivate
+from collections import defaultdict
+from datetime import datetime
+from flask import Flask, request, redirect, url_for, send_file, render_template
+from scapy.all import sniff, IP, TCP, UDP, Raw
+
 
 app = Flask(__name__, template_folder="templates")
-# ----------------------------
-# Global Data Structures
-# ----------------------------
 
+# Global data struct
 connections = defaultdict(lambda: {
     'start_time': None,
     'end_time': None,
@@ -30,9 +25,8 @@ connections = defaultdict(lambda: {
 capturing = False
 capture_thread = None
 
-# ----------------------------
+
 # Helper Functions
-# ----------------------------
 
 def port_category(port):
     if port is None:
@@ -198,7 +192,7 @@ def index():
         
         state_flags = ", ".join(data['state'])
 
-        # Create a human-readable timestamp from the end_time
+        # Create a human readable timestamp from the end_time
         timestamp_str = datetime.fromtimestamp(data['end_time']).strftime('%Y-%m-%d %H:%M:%S')
 
         table_data.append({
@@ -349,10 +343,6 @@ def get_alerts():
             "alert_ratio": ratio
         }
     }
-
-# def r =un_server(host="0.0.0.0", port=8080):
-#     # Must run with privileges (e.g., 'sudo') to allow Scapy to capture packets
-#     app.run(host=host, port=port, debug=False)
 
 if __name__ == "__main__":
     app.run()
